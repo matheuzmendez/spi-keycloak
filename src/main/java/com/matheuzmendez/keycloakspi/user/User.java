@@ -9,24 +9,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class User {
-	
+
     private String username;
-    private String codigoDealer;
-    private String cargo;
-    private List<String> permissoes;
-    private String filial;
-    private String nomeFilial;
-    private String montadora;
-    
-	public User(String username, String codigoDealer, String cargo, List<String> permissoes, String filial,
-			String nomeFilial, String montadora) {
-		this.username = username;
-		this.codigoDealer = codigoDealer;
-		this.cargo = cargo;
-		this.permissoes = permissoes;
-		this.filial = filial;
-		this.nomeFilial = nomeFilial;
-		this.montadora = montadora;
-	}
-    
+    private String firstName;
+    private String lastName;
+    private boolean enabled;
+    private Long created;
+    private List<String> roles;
+
+    public User(String username, String firstName, String lastName, boolean enabled, Long created, List<String> roles) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.enabled = enabled;
+        this.created = created;
+        this.roles = roles;
+    }
+
 }
