@@ -25,9 +25,16 @@ public class SoapConnection {
 	public boolean callSoapServiceAndBuildUser(String usuario, String senha) throws IOException {
 
 		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
-				+ "<soapenv:Header/>" + "<soapenv:Body>" + "<ser:AutenticarUsuarioDealer>" + "<ser:request>"
-				+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" + "<ser:Senha>" + senha + "</ser:Senha>"
-				+ "</ser:request>" + "</ser:AutenticarUsuarioDealer>" + "</soapenv:Body>" + "</soapenv:Envelope>";
+				+ "<soapenv:Header/>" 
+					+ "<soapenv:Body>" 
+						+ "<ser:AutenticarUsuarioDealer>" 
+							+ "<ser:request>"
+								+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" 
+								+ "<ser:Senha>" + senha + "</ser:Senha>"
+							+ "</ser:request>" 
+						+ "</ser:AutenticarUsuarioDealer>" 
+						+ "</soapenv:Body>" 
+				+ "</soapenv:Envelope>";
 
 		String response = callSoapService(xml);
 		System.out.println(response);
