@@ -16,32 +16,27 @@ import org.keycloak.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.matheuzmendez.keycloakspi.service.ExternalUserProviderService;
-
 public class ExternalUserStorageProviderFactory implements UserStorageProviderFactory<ExternalUserStorageProvider> {
 
 	private static final Logger log = LoggerFactory.getLogger(ExternalUserStorageProviderFactory.class);
-	public static final String PROVIDER_ID = "external-user-provider";
+//	public static final String PROVIDER_ID = "external-user-provider";
 
 	@Override
 	public ExternalUserStorageProvider create(KeycloakSession session, ComponentModel model) {
-		log.info("creating new ExternalUserStorageProvider");
-		ExternalUserProviderService service;
+		log.info("Entrei1");
 		try {
-			log.info("entrou");
-			service = new ExternalUserProviderService(model.get("url"), model.get("key"));
-			return new ExternalUserStorageProvider(session, model, service);
+			return new ExternalUserStorageProvider(session, model);
 		} catch (IOException e) {
-			log.info("deu errado1");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log.info("deu errado2");
+		log.info("Erro1");
 		return null;
 	}
 
 	@Override
 	public String getId() {
-		return PROVIDER_ID;
+		return "external-user-provider";
 	}
 
 	@Override

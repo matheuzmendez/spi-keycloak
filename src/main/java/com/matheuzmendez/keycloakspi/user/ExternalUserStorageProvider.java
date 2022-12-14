@@ -1,5 +1,6 @@
 package com.matheuzmendez.keycloakspi.user;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,22 +18,19 @@ import org.keycloak.storage.UserStorageProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.matheuzmendez.keycloakspi.service.ExternalUserProviderService;
-
 public class ExternalUserStorageProvider implements UserStorageProvider, CredentialInputValidator {
 
 	private static final Logger log = LoggerFactory.getLogger(ExternalUserStorageProvider.class);
 
-	protected KeycloakSession session;
-	protected ComponentModel model;
+	private final KeycloakSession session;
+	private final ComponentModel model;
 	private final ExternalUserProviderService externalUserService;
 
-	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model,
-			ExternalUserProviderService externalUserService) {
+	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) throws IOException {
 		log.info("teste");
 		this.session = session;
 		this.model = model;
-		this.externalUserService = externalUserService;
+		this.externalUserService = new ExternalUserProviderService(model.get("url"), model.get("key"));
 		log.info(session.toString() + "," + model.toString() + "," + externalUserService.toString());
 	}
 

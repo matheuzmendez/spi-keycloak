@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.service;
+package com.matheuzmendez.keycloakspi.user;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
