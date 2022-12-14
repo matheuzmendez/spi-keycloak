@@ -33,6 +33,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, Credent
 		this.session = session;
 		this.model = model;
 		this.externalUserService = externalUserService;
+		log.info(session.toString() + "," + model.toString() + "," + externalUserService.toString());
 	}
 
 	@Override
