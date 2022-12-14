@@ -1,1 +1,1 @@
-com.matheuzmendez.keycloakspi.user.LegacyUserStorageProviderFactory
+com.matheuzmendez.keycloakspi.user.ExternalUserStorageProviderFactory

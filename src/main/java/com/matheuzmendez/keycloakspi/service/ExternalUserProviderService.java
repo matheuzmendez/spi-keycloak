@@ -17,12 +17,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.matheuzmendez.keycloakspi.user.LegacyUserStorageProviderFactory;
-
-public class SoapConnection {
-	private static final Logger log = LoggerFactory.getLogger(LegacyUserStorageProviderFactory.class);
+public class ExternalUserProviderService {
+	private static final Logger log = LoggerFactory.getLogger(ExternalUserProviderService.class);
+	private static HttpURLConnection con;
 	
-	public boolean callSoapServiceAndBuildUser(String usuario, String senha) throws IOException {
+	public ExternalUserProviderService(String url, String key) throws IOException {
+        buildClient(url, key);
+    }
+
+    @SuppressWarnings("static-access")
+	private void buildClient(String url, String key) throws IOException {
+    	log.info("buildClient: " + url + " | " + key);
+    	URL obj = new URL(url);
+		this.con = (HttpURLConnection) obj.openConnection();
+    }
+    
+	public boolean callSoapServiceAndBuildUser(String usuario, String senha) {
 
 		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
 				+ "<soapenv:Header/>" 
@@ -45,16 +55,13 @@ public class SoapConnection {
 	private static String callSoapService(String soapRequest) {
 		try {
 			// URL do serviço
-			String url = "http://integration-uat/SecuritySvc/SegurancaService.svc";
-			URL obj = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//			String url = "http://integration-uat/SecuritySvc/SegurancaService.svc";
+			
 
 			// adiciona o método que deseja utilizar no SOAPUI
 			con.setRequestProperty("SOAPAction", "AutenticarUsuarioDealer");
-//			con.setRequestProperty("SOAPAction", "ConsultarUsuario");
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
-
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(soapRequest);
