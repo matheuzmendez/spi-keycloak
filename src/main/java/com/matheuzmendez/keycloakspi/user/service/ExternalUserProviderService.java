@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.user;
+package com.matheuzmendez.keycloakspi.user.service;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,13 +21,17 @@ public class ExternalUserProviderService {
 	private static final Logger log = LoggerFactory.getLogger(ExternalUserProviderService.class);
 	private static HttpURLConnection con;
 	
-	public ExternalUserProviderService(String url, String key) throws IOException {
-        buildClient(url, key);
+	public ExternalUserProviderService(String url) {
+        try {
+			buildClient(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     @SuppressWarnings("static-access")
-	private void buildClient(String url, String key) throws IOException {
-    	log.info("buildClient: " + url + " | " + key);
+	private void buildClient(String url) throws IOException {
+    	log.info("buildClient: " + url);
     	URL obj = new URL(url);
 		this.con = (HttpURLConnection) obj.openConnection();
     }
@@ -35,16 +39,16 @@ public class ExternalUserProviderService {
 	public boolean callSoapServiceAndBuildUser(String usuario, String senha) {
 
 		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
-				+ "<soapenv:Header/>" 
-					+ "<soapenv:Body>" 
-						+ "<ser:AutenticarUsuarioDealer>" 
-							+ "<ser:request>"
-								+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" 
-								+ "<ser:Senha>" + senha + "</ser:Senha>"
-							+ "</ser:request>" 
-						+ "</ser:AutenticarUsuarioDealer>" 
-						+ "</soapenv:Body>" 
-				+ "</soapenv:Envelope>";
+						+ "<soapenv:Header/>" 
+							+ "<soapenv:Body>" 
+								+ "<ser:AutenticarUsuarioDealer>" 
+									+ "<ser:request>"
+										+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" 
+										+ "<ser:Senha>" + senha + "</ser:Senha>"
+									+ "</ser:request>" 
+								+ "</ser:AutenticarUsuarioDealer>" 
+								+ "</soapenv:Body>" 
+						+ "</soapenv:Envelope>";
 
 		String response = callSoapService(xml);
 		System.out.println(response);
