@@ -22,7 +22,7 @@ public class UserMockImpl implements UserMock {
 				return user;
 		}
 
-		return null;
+		return new UserDto(username, "", "", "", "");
 	}
 
 	public boolean autenticar(String url, String username, String password) {
