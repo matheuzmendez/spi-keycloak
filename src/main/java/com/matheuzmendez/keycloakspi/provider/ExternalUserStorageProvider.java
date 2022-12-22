@@ -8,9 +8,9 @@ import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.UserModelDelegate;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
@@ -30,7 +30,6 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	private InitialContext initCtx;
 
 	private UserMock repo;
-	private GroupModel groupModel;
 
 	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
 		this.session = session;
@@ -138,9 +137,9 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setFilial(user.getFilial());
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
-		log.info(user.getRole());
+//		log.info(user.getRole());
 		userData.setRole(user.getRole());
-		log.info(userData.getRole());
+//		log.info(userData.getRole());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
 		if (local == null) {
@@ -173,23 +172,20 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			log.info("13");
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			log.info("14");
-//			local.grantRole(realmModel.getRole(userData.getRole()));
-//			log.info("15");
-//			groupModel = null;
-			if (!userData.getRole().isEmpty()) {
-				groupModel.setParent(groupModel);
-				groupModel.setName(userData.getRole());								
-				local.joinGroup(groupModel);
-			}
+			GroupModel group  = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
+			if (group == null) {
+                throw new RuntimeException("Unable to find group specified by path: " + userData.getRole());
+            }
+            local.joinGroup(group);
+//			GroupRepresentation groupRepresentation = new GroupRepresentation();
+////			groupRepresentation.setId(user.getRole());
+//			groupRepresentation.setName(user.getRole());
+//			GroupModel groupModel = 
+			
 			log.info("15");
-
-//			if (roleModel == null) {
-//				realmModel.addRole(userData.getRole());
-//			}
-//			 
-//			 local.grantRole(roleModel);
-//			Set<GroupModel> getGroups(realmModel, user.getUsername());
-
+			
+			
+			
 			
 			session.userCache().clear();
 			log.info("Local 1User Succesfully Created for username: " + userData.getUsername());
