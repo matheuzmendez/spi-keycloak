@@ -142,12 +142,12 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			log.info("Local User Not Found, adding user to Local");
 			local = session.userLocalStorage().addUser(realmModel, userData.getUsername());
 			local.setFederationLink(this.model.getId());
-			local.setUsername(userData.getUsername());
+			local.setEnabled(true);
+//			local.setUsername(userData.getUsername());
 			local.setEmail(userData.getEmail());
 			local.setCreatedTimestamp(System.currentTimeMillis());
 			local.setFirstName(userData.getFirstName());
 			local.setLastName(userData.getLastName());
-			local.setEnabled(true);
 			local.setEmailVerified(true);
 			local.setSingleAttribute("codDealer", userData.getCodDealer());
 			local.setSingleAttribute("cargo", userData.getCargo());
@@ -155,7 +155,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.grantRole(realmModel.getRole(userData.getRole()));			
-			
+			session.userCache().clear();
 //			 RoleModel roleModel = realmModel.getRole(userData.getRole());
 //			 
 //			 if (roleModel == null) {

@@ -6,6 +6,8 @@ import com.matheuzmendez.keycloakspi.user.service.UserMock;
 import com.matheuzmendez.keycloakspi.user.service.enums.TypesQuery;
 
 public class UserMockImpl implements UserMock {
+	
+	
 //	private List<UserDto> users;
 
 //	public UserMockImpl() {
