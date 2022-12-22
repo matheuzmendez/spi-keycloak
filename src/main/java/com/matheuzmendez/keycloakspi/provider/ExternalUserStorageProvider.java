@@ -138,7 +138,9 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setFilial(user.getFilial());
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
+		log.info(user.getRole());
 		userData.setRole(user.getRole());
+		log.info(userData.getRole());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
 		if (local == null) {
@@ -173,9 +175,12 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			log.info("14");
 //			local.grantRole(realmModel.getRole(userData.getRole()));
 //			log.info("15");
-			groupModel = null;
-			groupModel.setName(userData.getRole());				
-			local.joinGroup(groupModel);
+//			groupModel = null;
+			if (!userData.getRole().isEmpty()) {
+				groupModel.setParent(groupModel);
+				groupModel.setName(userData.getRole());								
+				local.joinGroup(groupModel);
+			}
 			log.info("15");
 
 //			if (roleModel == null) {
