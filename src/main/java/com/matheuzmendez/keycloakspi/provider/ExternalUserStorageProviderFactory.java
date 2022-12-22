@@ -46,7 +46,8 @@ public class ExternalUserStorageProviderFactory implements UserStorageProviderFa
 	@Override
 	public List<ProviderConfigProperty> getConfigProperties() {
 		return ProviderConfigurationBuilder.create()
-				.property("url", "URL", "Base URL of the API", ProviderConfigProperty.STRING_TYPE, "", null)
+				.property("urlConsulta", "URLConsulta", "Base URL of the API", ProviderConfigProperty.STRING_TYPE, "", null)
+				.property("urlAutentica", "URLAutentica", "Base URL of the API", ProviderConfigProperty.STRING_TYPE, "", null)
 				.build();
 	}
 

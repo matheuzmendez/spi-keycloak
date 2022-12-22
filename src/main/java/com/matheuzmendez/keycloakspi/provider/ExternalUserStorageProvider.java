@@ -57,12 +57,12 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 	@Override
 	public UserModel getUserByUsername(String username, RealmModel realmModel) {
-		if (model.getConfig().getFirst("url") == null) {
-			log.error("Security Service URL not defined!");
+		if (model.getConfig().getFirst("urlConsulta") == null) {
+			log.error("Security Service URL (urlConsulta) not defined!");
 			return null;
 		}
 
-		UserDto user = this.repo.obter(username);
+		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"), username);
 
 		if (user == null) {
 			log.info("Username: " + username + " not found");
@@ -96,9 +96,14 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	@Override
 	public boolean isValid(RealmModel realm, UserModel userModel, CredentialInput input) {
 		log.info("isValid method called for username: " + userModel.getUsername());
+		
+		if (model.getConfig().getFirst("urlAutentica") == null) {
+			log.error("Security Service URL (urlAutentica) not defined!");
+			return false;
+		}
 
 		try {
-			if (this.repo.autenticar(model.getConfig().getFirst("url"), userModel.getUsername(),
+			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"), userModel.getUsername(),
 					input.getChallengeResponse())) {
 				log.info("Password Matched for:" + userModel.getUsername());
 				return true;
@@ -119,34 +124,47 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	}
 
 	private UserModel getLocalUserByUsername(UserDto user, RealmModel realmModel) {
+//		UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial, montadora);
 		UserData userData = new UserData(session, realmModel, this.model);
-		userData.setEmail(user.getEmail());
 		userData.setUsername(user.getUsername());
-		userData.setFirstName(user.getFirstname());
-		userData.setLastName(user.getLastname());
-		// userData.setRole("BXPLA1000");
+		userData.setEmail(user.getEmail());
+		userData.setFirstName(user.getFirstName());
+		userData.setLastName(user.getLastName());
+		userData.setCodDealer(user.getCodDealer());
+		userData.setCargo(user.getCargo());
+		userData.setFilial(user.getFilial());
+		userData.setNomeFilial(user.getNomeFilial());
+		userData.setMontadora(user.getMontadora());
+		userData.setRole(user.getRole());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
 		if (local == null) {
 			log.info("Local User Not Found, adding user to Local");
 			local = session.userLocalStorage().addUser(realmModel, userData.getUsername());
 			local.setFederationLink(this.model.getId());
-			local.setEmail(userData.getEmail());
 			local.setUsername(userData.getUsername());
+			local.setEmail(userData.getEmail());
 			local.setCreatedTimestamp(System.currentTimeMillis());
 			local.setFirstName(userData.getFirstName());
 			local.setLastName(userData.getLastName());
 			local.setEnabled(true);
 			local.setEmailVerified(true);
+			local.setSingleAttribute("codDealer", userData.getCodDealer());
+			local.setSingleAttribute("cargo", userData.getCargo());
+			local.setSingleAttribute("filial", userData.getFilial());
+			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
+			local.setSingleAttribute("montadora", userData.getMontadora());
+			local.grantRole(realmModel.getRole(userData.getRole()));			
+			
+//			 RoleModel roleModel = realmModel.getRole(userData.getRole());
+//			 
+//			 if (roleModel == null) {
+//				 realmModel.addRole(userData.getRole());
+//			 }
+//			 
+//			 local.grantRole(roleModel);
 
-			// RoleModel roleModel = realmModel.getRole("BXPLA100");
-			// if (roleModel == null)
-			// realmModel.addRole("BXPLA100");
-
-			// realmModel.getRole("BXPLA100");
-			// local.grantRole(roleModel);
-
-			log.info("Local User Succesfully Created for username: " + userData.getUsername());
+			log.info("Local 1User Succesfully Created for username: " + userData.getUsername());
 		}
 		return new UserModelDelegate(local) {
 			@Override
