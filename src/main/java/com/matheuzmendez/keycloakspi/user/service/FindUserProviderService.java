@@ -21,13 +21,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.matheuzmendez.keycloakspi.user.service.enums.TypesQuery;
-
-public class ExternalUserProviderService {
-	private static final Logger log = LoggerFactory.getLogger(ExternalUserProviderService.class);
+public class FindUserProviderService {
+	private static final Logger log = LoggerFactory.getLogger(AuthenticateUserProviderService.class);
 	private static HttpURLConnection con;
 
-	public ExternalUserProviderService(String url) {
+	public FindUserProviderService(String url) {
 		try {
 			buildClient(url);
 		} catch (IOException e) {
@@ -41,29 +39,9 @@ public class ExternalUserProviderService {
 		URL obj = new URL(url);
 		this.con = (HttpURLConnection) obj.openConnection();
 	}
-	
-	public boolean callAutenticaUsuario(String usuario, String senha, TypesQuery typeQuery) {
 
-		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
-						+ "<soapenv:Header/>" 
-							+ "<soapenv:Body>" 
-								+ "<ser:AutenticarUsuarioDealer>" 
-									+ "<ser:request>"
-										+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" 
-										+ "<ser:Senha>" + senha + "</ser:Senha>"
-									+ "</ser:request>" 
-								+ "</ser:AutenticarUsuarioDealer>" 
-								+ "</soapenv:Body>" 
-						+ "</soapenv:Envelope>";
-
-		String response = callSoapService(xml, typeQuery);
-//		System.out.println(response);
-
-		return extractValidResponse(response);
-	}
-	
-	public UserDto callConsultaUsuario(String usuario, TypesQuery typeQuery) {
-
+	public UserDto callConsultaUsuario(String usuario) {
+		
 		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
 				+ "   <soapenv:Header/>"
 				+ "   <soapenv:Body>"
@@ -77,25 +55,21 @@ public class ExternalUserProviderService {
 				+ "   </soapenv:Body>"
 				+ "</soapenv:Envelope>";
 
-		String response = callSoapService(xml, typeQuery);
+		String response = callSoapService(xml);
 //		System.out.println(response);
 
 		return extractInfoUser(usuario, response);
 	}
 
-	private static String callSoapService(String soapRequest, TypesQuery typeQuery) {
+	private static String callSoapService(String soapRequest) {
 		try {
 			// URL do serviço
 			// String url = "http://integration-uat/SecuritySvc/SegurancaService.svc";
 			// String url = "http://integration-uat/SecuritySvc/DealerUserService.svc";
 
 			// adiciona o método que deseja utilizar no SOAPUI
-			if (typeQuery.equals(TypesQuery.AutenticaUsuario)) {
-				con.setRequestProperty("SOAPAction", "AutenticarUsuarioDealer");
-			} else {
-				con.setRequestProperty("SOAPAction", "ConsultarUsuario");
-			}
 
+			con.setRequestProperty("SOAPAction", "ConsultarUsuario");
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
 			con.setDoOutput(true);
@@ -122,38 +96,11 @@ public class ExternalUserProviderService {
 		}
 	}
 
-	private static Boolean extractValidResponse(String responseXML) {
-		String isValid = "AutenticacaoOk";
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder;
-			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(responseXML)));
-			NodeList nList = doc.getElementsByTagName("Authentication");
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					String authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
-							.getTextContent();
-					System.out.println(authenticationStatus);
-
-					return (authenticationStatus.equals(isValid) ? true : false);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
 	private static UserDto extractInfoUser(String usuario, String responseXML) {
 		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, TypesRoles.TPO_STA_GES_LOF,
 				TypesRoles.TPO_STA_GES_GOP, TypesRoles.TPO_STA_GES_GOF);
-		String username = usuario, firstName, lastName;
-		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "";
+		String username = usuario, firstName = "", lastName = "";
+		String email = "", codDealer = "", cargo = "", filial = "", nomeFilial = "", montadora = "", role = "";
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
@@ -170,7 +117,7 @@ public class ExternalUserProviderService {
 					lastName = "";
 					codDealer = eElement.getElementsByTagName("Concess").item(0).getTextContent();
 					cargo = eElement.getElementsByTagName("Cargo").item(0).getTextContent();
-					
+
 					NodeList nListPerfis = doc.getElementsByTagName("Perfis");
 					for (int tempPerfis = 0; tempPerfis < nListPerfis.getLength(); tempPerfis++) {
 						Node nNodePerfis = nListPerfis.item(tempPerfis);
@@ -188,7 +135,7 @@ public class ExternalUserProviderService {
 							}
 						}
 					}
-					
+
 					NodeList nListRegional = doc.getElementsByTagName("Regional");
 					for (int tempRegional = 0; tempRegional < nListRegional.getLength(); tempRegional++) {
 						Node nNodeRegional = nListRegional.item(tempRegional);

@@ -5,8 +5,10 @@ import javax.naming.InitialContext;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
+import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.UserModelDelegate;
@@ -28,12 +30,13 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	private InitialContext initCtx;
 
 	private UserMock repo;
+	private GroupModel groupModel;
 
 	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
 		this.session = session;
 		this.model = model;
 		this.repo = new UserMockImpl();
-		
+
 		try {
 			initCtx = new InitialContext();
 		} catch (Exception ex) {
@@ -96,7 +99,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	@Override
 	public boolean isValid(RealmModel realm, UserModel userModel, CredentialInput input) {
 		log.info("isValid method called for username: " + userModel.getUsername());
-		
+
 		if (model.getConfig().getFirst("urlAutentica") == null) {
 			log.error("Security Service URL (urlAutentica) not defined!");
 			return false;
@@ -141,29 +144,49 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		if (local == null) {
 			log.info("Local User Not Found, adding user to Local");
 			local = session.userLocalStorage().addUser(realmModel, userData.getUsername());
+			log.info("1");
 			local.setFederationLink(this.model.getId());
+			log.info("2");
 			local.setEnabled(true);
-//			local.setUsername(userData.getUsername());
+			log.info("3");
+			local.setUsername(userData.getUsername());
+			log.info("4");
 			local.setEmail(userData.getEmail());
+			log.info("5");
 			local.setCreatedTimestamp(System.currentTimeMillis());
+			log.info("6");
 			local.setFirstName(userData.getFirstName());
+			log.info("7");
 			local.setLastName(userData.getLastName());
+			log.info("8");
 			local.setEmailVerified(true);
+			log.info("9");
 			local.setSingleAttribute("codDealer", userData.getCodDealer());
+			log.info("10");
 			local.setSingleAttribute("cargo", userData.getCargo());
+			log.info("11");
 			local.setSingleAttribute("filial", userData.getFilial());
+			log.info("12");
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
+			log.info("13");
 			local.setSingleAttribute("montadora", userData.getMontadora());
-			local.grantRole(realmModel.getRole(userData.getRole()));			
-			session.userCache().clear();
-//			 RoleModel roleModel = realmModel.getRole(userData.getRole());
-//			 
-//			 if (roleModel == null) {
-//				 realmModel.addRole(userData.getRole());
-//			 }
+			log.info("14");
+//			local.grantRole(realmModel.getRole(userData.getRole()));
+//			log.info("15");
+			groupModel = null;
+			groupModel.setName(userData.getRole());				
+			local.joinGroup(groupModel);
+			log.info("15");
+
+//			if (roleModel == null) {
+//				realmModel.addRole(userData.getRole());
+//			}
 //			 
 //			 local.grantRole(roleModel);
+//			Set<GroupModel> getGroups(realmModel, user.getUsername());
 
+			
+			session.userCache().clear();
 			log.info("Local 1User Succesfully Created for username: " + userData.getUsername());
 		}
 		return new UserModelDelegate(local) {
@@ -173,5 +196,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			}
 		};
 	}
+	
+	
 
 }
