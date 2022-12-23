@@ -159,15 +159,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
-			log.info("OK");
-
-			GroupModel group = (GroupModel) local.getGroupsStream();
-
-			if (group != null) {
-				local.leaveGroup(group);
-			}
-
-			group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
+			
+			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
 
 			if (group == null) {
 				throw new RuntimeException("Unable to find group specified by path: " + userData.getRole());
@@ -177,6 +170,13 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
+		} else {
+			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realmModel, local.getGroupsStream().toString());
+			if (leaveGroup != null) {
+				local.leaveGroup(leaveGroup);
+			}
+			GroupModel joinGroup = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
+			local.joinGroup(joinGroup);
 		}
 		return new UserModelDelegate(local) {
 			@Override
