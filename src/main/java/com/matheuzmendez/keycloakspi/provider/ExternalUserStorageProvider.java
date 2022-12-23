@@ -139,6 +139,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
 		userData.setRole(user.getRole());
+		userData.setCodMontadora(user.getCodMontadora());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
 		if (local == null) {
@@ -158,6 +159,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
+			log.info("OK");
 
 			GroupModel group = (GroupModel) local.getGroupsStream();
 
