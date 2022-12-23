@@ -6,10 +6,10 @@ public class UserDto {
 	private String email;
 	private String firstName;
 	private String lastName;
-	private String codDealer, cargo, filial, nomeFilial, montadora, role;
+	private String codDealer, cargo, filial, nomeFilial, montadora, role, codMontadora;
 
 	public UserDto(String username, String email, String firstName, String lastName,
-					String codDealer, String cargo, String filial, String nomeFilial, String montadora, String role) {
+					String codDealer, String cargo, String filial, String nomeFilial, String montadora, String role, String codMontadora) {
 		this.username = username;
 		this.email = email;
 		this.firstName = firstName;
@@ -20,6 +20,7 @@ public class UserDto {
 		this.nomeFilial = nomeFilial;
 		this.montadora = montadora;
 		this.role = role;
+		this.codMontadora = codMontadora;
 	}
 
 	public String getUsername() {
@@ -85,4 +86,13 @@ public class UserDto {
 	public String getRole() {
 		return role;
 	}
+	
+	public void setCodMontadora(String codMontadora) {
+		this.codMontadora = codMontadora;
+	}
+
+	public String getCodMontadora() {
+		return codMontadora;
+	}
+	
 }

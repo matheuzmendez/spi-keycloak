@@ -25,7 +25,7 @@ public class UserData extends AbstractUserAdapterFederatedStorage {
 		componentModel = storageProviderModel;
 	}
 
-	private String userId, email, username, role, codDealer, cargo, filial, nomeFilial, montadora;
+	private String userId, email, username, role, codDealer, cargo, filial, nomeFilial, montadora, codMontadora;
 	private boolean enabled;
 
 	@Override
@@ -152,6 +152,14 @@ public class UserData extends AbstractUserAdapterFederatedStorage {
 	public String getMontadora() {
 		return montadora;
 	}
+	
+	public void setCodMontadora(String codMontadora) {
+		this.codMontadora = codMontadora;
+	}
+
+	public String getCodMontadora() {
+		return codMontadora;
+	}
 
 	@Override
 	public void setCreatedTimestamp(Long arg0) {
@@ -191,6 +199,7 @@ public class UserData extends AbstractUserAdapterFederatedStorage {
 		attributes.add("filial", getFilial());
 		attributes.add("nomeFilial", getNomeFilial());
 		attributes.add("montadora", getMontadora());
+		attributes.add("codMontadora", getCodMontadora());
 		return attributes;
 	}
 	

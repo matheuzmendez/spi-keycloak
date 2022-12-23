@@ -23,24 +23,25 @@ public class AuthenticateUserProviderService {
 	private static final Logger log = LoggerFactory.getLogger(AuthenticateUserProviderService.class);
 	private static HttpURLConnection con;
 
-	public AuthenticateUserProviderService(String url) {
+	public AuthenticateUserProviderService(String url, String parametro) {
 		try {
-			buildClient(url);
+			buildClient(url, parametro);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@SuppressWarnings("static-access")
-	private void buildClient(String url) throws IOException {
+	private void buildClient(String url, String parametro) throws IOException {
 		log.info("buildClient: " + url);
 		URL obj = new URL(url);
 		this.con = (HttpURLConnection) obj.openConnection();
+		this.con.setRequestProperty("SOAPAction", parametro);
 	}
 	
 	public boolean callAutenticaUsuario(String usuario, String senha) {
 
-		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
+		String requestAutenticaUsuario = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
 						+ "<soapenv:Header/>" 
 							+ "<soapenv:Body>" 
 								+ "<ser:AutenticarUsuarioDealer>" 
@@ -52,54 +53,44 @@ public class AuthenticateUserProviderService {
 								+ "</soapenv:Body>" 
 						+ "</soapenv:Envelope>";
 
-		String response = callSoapService(xml);
-//		System.out.println(response);
-
-		return extractValidResponse(response);
+		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
+		return extractValidResponse(responseAutenticaUsuario);
 	}
 
-	private static String callSoapService(String soapRequest) {
+	private static String callSoapService(String requestAutenticaUsuario) {
 		try {
-			// URL do serviço
-			// String url = "http://integration-uat/SecuritySvc/SegurancaService.svc";
-			// String url = "http://integration-uat/SecuritySvc/DealerUserService.svc";
-
 			// adiciona o método que deseja utilizar no SOAPUI
-
-			con.setRequestProperty("SOAPAction", "AutenticarUsuarioDealer");
+			
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(soapRequest);
+			wr.writeBytes(requestAutenticaUsuario);
 			wr.flush();
 			wr.close();
-			String responseStatus = con.getResponseMessage();
-			System.out.println(responseStatus);
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
+			
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
 			}
+			
 			in.close();
-
-			// You can play with response which is available as string now:
-			String finalvalue = response.toString();
-
-			return finalvalue;
+			
+			return response.toString();
 		} catch (Exception e) {
 			return e.getMessage();
 		}
 	}
 
-	private static Boolean extractValidResponse(String responseXML) {
+	private static Boolean extractValidResponse(String responseAutenticaUsuario) {
 		String isValid = "AutenticacaoOk";
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
 			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(responseXML)));
+			Document doc = builder.parse(new InputSource(new StringReader(responseAutenticaUsuario)));
 			NodeList nList = doc.getElementsByTagName("Authentication");
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);

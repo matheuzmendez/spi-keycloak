@@ -64,7 +64,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			return null;
 		}
 
-		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"), username);
+		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"), model.getConfig().getFirst("parametroConsulta"), username);
 
 		if (user == null) {
 			log.info("Username: " + username + " not found");
@@ -105,7 +105,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		}
 
 		try {
-			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"), userModel.getUsername(),
+			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"),
+					model.getConfig().getFirst("parametroAutentica"), userModel.getUsername(),
 					input.getChallengeResponse())) {
 				log.info("Password Matched for:" + userModel.getUsername());
 				return true;
@@ -126,7 +127,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	}
 
 	private UserModel getLocalUserByUsername(UserDto user, RealmModel realmModel) {
-//		UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial, montadora);
+
 		UserData userData = new UserData(session, realmModel, this.model);
 		userData.setUsername(user.getUsername());
 		userData.setEmail(user.getEmail());
@@ -137,58 +138,43 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setFilial(user.getFilial());
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
-//		log.info(user.getRole());
 		userData.setRole(user.getRole());
-//		log.info(userData.getRole());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
 		if (local == null) {
 			log.info("Local User Not Found, adding user to Local");
 			local = session.userLocalStorage().addUser(realmModel, userData.getUsername());
-			log.info("1");
 			local.setFederationLink(this.model.getId());
-			log.info("2");
 			local.setEnabled(true);
-			log.info("3");
 			local.setUsername(userData.getUsername());
-			log.info("4");
 			local.setEmail(userData.getEmail());
-			log.info("5");
 			local.setCreatedTimestamp(System.currentTimeMillis());
-			log.info("6");
 			local.setFirstName(userData.getFirstName());
-			log.info("7");
 			local.setLastName(userData.getLastName());
-			log.info("8");
 			local.setEmailVerified(true);
-			log.info("9");
 			local.setSingleAttribute("codDealer", userData.getCodDealer());
-			log.info("10");
 			local.setSingleAttribute("cargo", userData.getCargo());
-			log.info("11");
 			local.setSingleAttribute("filial", userData.getFilial());
-			log.info("12");
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
-			log.info("13");
 			local.setSingleAttribute("montadora", userData.getMontadora());
-			log.info("14");
-			GroupModel group  = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
+			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
+
+			GroupModel group = (GroupModel) local.getGroupsStream();
+
+			if (group != null) {
+				local.leaveGroup(group);
+			}
+
+			group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
+
 			if (group == null) {
-                throw new RuntimeException("Unable to find group specified by path: " + userData.getRole());
-            }
-            local.joinGroup(group);
-//			GroupRepresentation groupRepresentation = new GroupRepresentation();
-////			groupRepresentation.setId(user.getRole());
-//			groupRepresentation.setName(user.getRole());
-//			GroupModel groupModel = 
-			
-			log.info("15");
-			
-			
-			
-			
+				throw new RuntimeException("Unable to find group specified by path: " + userData.getRole());
+			}
+
+			local.joinGroup(group);
+
 			session.userCache().clear();
-			log.info("Local 1User Succesfully Created for username: " + userData.getUsername());
+			log.info("Local User Succesfully Created for username: " + userData.getUsername());
 		}
 		return new UserModelDelegate(local) {
 			@Override
@@ -197,7 +183,5 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			}
 		};
 	}
-	
-	
 
 }
