@@ -13,6 +13,8 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,12 +24,14 @@ import org.xml.sax.InputSource;
 import com.matheuzmendez.keycloakspi.user.service.roles.TypesRoles;
 
 public class FindUserProviderService {
+	private static Logger log = LoggerFactory.getLogger(FindUserProviderService.class);
 	private static HttpURLConnection con;
 
 	public FindUserProviderService(String url, String parametro) {
 		try {
 			buildClient(url, parametro);
 		} catch (IOException e) {
+			log.error("Error during build Client: " + url, e);
 			e.printStackTrace();
 		}
 	}
@@ -41,7 +45,8 @@ public class FindUserProviderService {
 
 	public UserDto callConsultaUsuario(String usuario) {
 		
-		String requestConsultaUsuario = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
+		String requestConsultaUsuario = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' "
+				+ "xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
 				+ "   <soapenv:Header/>"
 				+ "   <soapenv:Body>"
 				+ "      <ser:ConsultarUsuario>"
@@ -55,13 +60,13 @@ public class FindUserProviderService {
 				+ "</soapenv:Envelope>";
 
 		String responseConsultaUsuario = callSoapService(requestConsultaUsuario);
-		return extractInfoUser(usuario, responseConsultaUsuario);
+		
+		return (responseConsultaUsuario != null) ? extractInfoUser(usuario, responseConsultaUsuario) : null;
+		
 	}
 
 	private static String callSoapService(String requestConsultaUsuario) {
 		try {
-			// adiciona o método que deseja utilizar no SOAPUI
-			
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
 			con.setDoOutput(true);
@@ -81,7 +86,8 @@ public class FindUserProviderService {
 
 			return response.toString();
 		} catch (Exception e) {
-			return e.getMessage();
+			log.error("Error calling Soap Service: " + e);
+			return null;
 		}
 	}
 
@@ -90,7 +96,7 @@ public class FindUserProviderService {
 													TypesRoles.TPO_STA_GES_LOF,
 													TypesRoles.TPO_STA_GES_GOP, 
 													TypesRoles.TPO_STA_GES_GOF);
-		String username = usuario, firstName, lastName;
+		String username, firstName, lastName;
 		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "", codMontadora = "";
 		
 		try {
@@ -105,6 +111,7 @@ public class FindUserProviderService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
+					username = eElement.getElementsByTagName("CpfCnpj").item(0).getTextContent();
 					email = eElement.getElementsByTagName("Email").item(0).getTextContent();
 					firstName = eElement.getElementsByTagName("Nome").item(0).getTextContent();
 					lastName = "";
@@ -152,12 +159,13 @@ public class FindUserProviderService {
 						}
 					}
 					
-					return new UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial,
-							montadora, role, codMontadora);
+					return (username.equals(usuario)) ? new UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial,
+								montadora, role, codMontadora) : null;
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error extracting info of User: " + e);
+			return null;
 		}
 		return null;
 	}

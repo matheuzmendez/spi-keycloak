@@ -167,6 +167,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			}
 
 			local.joinGroup(group);
+			log.info("Local User added in group: " + group.toString());
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
@@ -174,9 +175,11 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realmModel, local.getGroupsStream().toString());
 			if (leaveGroup != null) {
 				local.leaveGroup(leaveGroup);
+				log.info("Local User leaving group: " + leaveGroup.toString());
 			}
 			GroupModel joinGroup = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
 			local.joinGroup(joinGroup);
+			log.info("Local User added in group: " + joinGroup.toString());
 		}
 		return new UserModelDelegate(local) {
 			@Override
