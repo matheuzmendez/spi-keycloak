@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.user.service;
+package vwfsbr.comission.keycloakspi.user.service;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.matheuzmendez.keycloakspi.user.service.roles.TypesRoles;
+import vwfsbr.comission.keycloakspi.user.service.roles.TypesRoles;
 
 public class FindUserProviderService {
 	private static Logger log = LoggerFactory.getLogger(FindUserProviderService.class);
@@ -164,7 +164,7 @@ public class FindUserProviderService {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Error extracting info of User: " + e);
+			log.error("Error extracting info of User: User not found in External DB");
 			return null;
 		}
 		return null;

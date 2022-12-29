@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.provider.model;
+package vwfsbr.comission.keycloakspi.provider.model;
 
 import java.util.LinkedList;
 import java.util.List;

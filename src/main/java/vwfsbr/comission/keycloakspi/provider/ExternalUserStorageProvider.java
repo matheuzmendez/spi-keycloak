@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.provider;
+package vwfsbr.comission.keycloakspi.provider;
 
 import javax.naming.InitialContext;
 
@@ -17,10 +17,10 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.matheuzmendez.keycloakspi.provider.model.UserData;
-import com.matheuzmendez.keycloakspi.user.service.UserDto;
-import com.matheuzmendez.keycloakspi.user.service.UserMock;
-import com.matheuzmendez.keycloakspi.user.service.impl.UserMockImpl;
+import vwfsbr.comission.keycloakspi.provider.model.UserData;
+import vwfsbr.comission.keycloakspi.user.service.UserDto;
+import vwfsbr.comission.keycloakspi.user.service.UserMock;
+import vwfsbr.comission.keycloakspi.user.service.impl.UserMockImpl;
 
 public class ExternalUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
 

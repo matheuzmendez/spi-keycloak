@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.provider;
+package vwfsbr.comission.keycloakspi.provider;
 
 import java.util.List;
 

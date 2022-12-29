@@ -1,9 +1,9 @@
-package com.matheuzmendez.keycloakspi.user.service.impl;
+package vwfsbr.comission.keycloakspi.user.service.impl;
 
-import com.matheuzmendez.keycloakspi.user.service.AuthenticateUserProviderService;
-import com.matheuzmendez.keycloakspi.user.service.FindUserProviderService;
-import com.matheuzmendez.keycloakspi.user.service.UserDto;
-import com.matheuzmendez.keycloakspi.user.service.UserMock;
+import vwfsbr.comission.keycloakspi.user.service.AuthenticateUserProviderService;
+import vwfsbr.comission.keycloakspi.user.service.FindUserProviderService;
+import vwfsbr.comission.keycloakspi.user.service.UserDto;
+import vwfsbr.comission.keycloakspi.user.service.UserMock;
 
 public class UserMockImpl implements UserMock {
 

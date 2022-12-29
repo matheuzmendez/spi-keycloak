@@ -1,4 +1,4 @@
-package com.matheuzmendez.keycloakspi.user.service.roles;
+package vwfsbr.comission.keycloakspi.user.service.roles;
 
 public class TypesRoles {
 
