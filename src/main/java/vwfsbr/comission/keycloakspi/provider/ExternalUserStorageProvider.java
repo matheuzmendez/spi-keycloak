@@ -166,12 +166,11 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			GroupModel group = null;
 			try {
 				group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());				
+				local.joinGroup(group);
+				log.info("Local User added in group: " + group.toString());
 			} catch (NotFoundException e) {
 				log.info("Group not found: " + e);
 			}
-
-			local.joinGroup(group);
-			log.info("Local User added in group: " + group.toString());
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
