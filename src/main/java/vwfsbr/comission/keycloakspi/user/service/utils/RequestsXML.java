@@ -27,7 +27,7 @@ public class RequestsXML {
 				+ "         <ser:request>"
 				+ "            <ser:AcessoDealer>"
 				+ "               <ser:CpfCnpj>" + usuario + "</ser:CpfCnpj>"
-				+ "               <Concess>" + codDealer + "</Concess>"
+				+ "               <ser:Concess>" + codDealer + "</ser:Concess>"
 				+ "            </ser:AcessoDealer>"
 				+ "         </ser:request>"
 				+ "      </ser:ConsultarUsuario>"
