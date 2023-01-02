@@ -141,7 +141,6 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
 		userData.setRole(user.getRole());
-		log.info(userData.getRole());
 		userData.setCodMontadora(user.getCodMontadora());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
