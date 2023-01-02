@@ -19,6 +19,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import vwfsbr.comission.keycloakspi.user.service.utils.RequestsXML;
+
 public class AuthenticateUserProviderService {
 	private static final Logger log = LoggerFactory.getLogger(AuthenticateUserProviderService.class);
 	private static HttpURLConnection con;
@@ -41,26 +43,14 @@ public class AuthenticateUserProviderService {
 	
 	public boolean callAutenticaUsuario(String usuario, String senha) {
 
-		String requestAutenticaUsuario = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
-						+ "<soapenv:Header/>" 
-							+ "<soapenv:Body>" 
-								+ "<ser:AutenticarUsuarioDealer>" 
-									+ "<ser:request>"
-										+ "<ser:LoginUsuario>" + usuario + "</ser:LoginUsuario>" 
-										+ "<ser:Senha>" + senha + "</ser:Senha>"
-									+ "</ser:request>" 
-								+ "</ser:AutenticarUsuarioDealer>" 
-								+ "</soapenv:Body>" 
-						+ "</soapenv:Envelope>";
-
+		String requestAutenticaUsuario = RequestsXML.requestAutenticaUsuario(usuario, senha);
 		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
+		
 		return extractValidResponse(responseAutenticaUsuario);
 	}
 
 	private static String callSoapService(String requestAutenticaUsuario) {
 		try {
-			// adiciona o método que deseja utilizar no SOAPUI
-			
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
 			con.setDoOutput(true);

@@ -21,7 +21,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import vwfsbr.comission.keycloakspi.user.service.roles.TypesRoles;
+import vwfsbr.comission.keycloakspi.user.service.utils.RequestsXML;
+import vwfsbr.comission.keycloakspi.user.service.utils.TypesRoles;
 
 public class FindUserProviderService {
 	private static Logger log = LoggerFactory.getLogger(FindUserProviderService.class);
@@ -43,26 +44,20 @@ public class FindUserProviderService {
 		this.con.setRequestProperty("SOAPAction", parametro);
 	}
 
-	public UserDto callConsultaUsuario(String usuario) {
-		
-		String requestConsultaUsuario = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' "
-				+ "xmlns:ser='http://www.vwfsbr.com.br/servicebus'>"
-				+ "   <soapenv:Header/>"
-				+ "   <soapenv:Body>"
-				+ "      <ser:ConsultarUsuario>"
-				+ "         <ser:request>"
-				+ "            <ser:AcessoDealer>"
-				+ "               <ser:CpfCnpj>" + usuario + "</ser:CpfCnpj>"
-				+ "            </ser:AcessoDealer>"
-				+ "         </ser:request>"
-				+ "      </ser:ConsultarUsuario>"
-				+ "   </soapenv:Body>"
-				+ "</soapenv:Envelope>";
-
+	public UserDto consultaUsuario(String usuario) {
+		String requestConsultaUsuario = RequestsXML.requestConsultaUsuario(usuario);
 		String responseConsultaUsuario = callSoapService(requestConsultaUsuario);
+		UserDto userDto = extractInfoUser(usuario, responseConsultaUsuario);
 		
-		return (responseConsultaUsuario != null) ? extractInfoUser(usuario, responseConsultaUsuario) : null;
+		return (userDto != null) ? userDto : null; 
+	}
+
+	public UserDto consultaUsuarioDealer(String usuario, String codDealer) {
+		String requestConsultaUsuario = RequestsXML.requestConsultaUsuario(usuario, codDealer);
+		String responseConsultaUsuario = callSoapService(requestConsultaUsuario);
+		UserDto userDto = extractInfoUser(usuario, responseConsultaUsuario);
 		
+		return (userDto != null) ? userDto : null;
 	}
 
 	private static String callSoapService(String requestConsultaUsuario) {
@@ -83,7 +78,7 @@ public class FindUserProviderService {
 			}
 			
 			in.close();
-
+			
 			return response.toString();
 		} catch (Exception e) {
 			log.error("Error calling Soap Service: " + e);
@@ -96,6 +91,7 @@ public class FindUserProviderService {
 													TypesRoles.TPO_STA_GES_LOF,
 													TypesRoles.TPO_STA_GES_GOP, 
 													TypesRoles.TPO_STA_GES_GOF);
+
 		String username, firstName, lastName;
 		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "", codMontadora = "";
 		
@@ -157,10 +153,9 @@ public class FindUserProviderService {
 							montadora = eElementConcessionaria.getElementsByTagName("Nome").item(0).getTextContent();
 							codMontadora = eElementConcessionaria.getElementsByTagName("CodigoMontadora").item(0).getTextContent();
 						}
-					}
-					
+					}					
 					return (username.equals(usuario)) ? new UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial,
-								montadora, role, codMontadora) : null;
+								montadora, role, codMontadora) : null;						
 				}
 			}
 		} catch (Exception e) {

@@ -17,6 +17,8 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openshift.restclient.NotFoundException;
+
 import vwfsbr.comission.keycloakspi.provider.model.UserData;
 import vwfsbr.comission.keycloakspi.user.service.UserDto;
 import vwfsbr.comission.keycloakspi.user.service.UserMock;
@@ -139,6 +141,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		userData.setNomeFilial(user.getNomeFilial());
 		userData.setMontadora(user.getMontadora());
 		userData.setRole(user.getRole());
+		log.info(userData.getRole());
 		userData.setCodMontadora(user.getCodMontadora());
 
 		UserModel local = session.userLocalStorage().getUserByUsername(realmModel, user.getUsername());
@@ -160,10 +163,11 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
 			
-			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
-
-			if (group == null) {
-				throw new RuntimeException("Unable to find group specified by path: " + userData.getRole());
+			GroupModel group = null;
+			try {
+				group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());				
+			} catch (NotFoundException e) {
+				log.info("Group not found: " + e);
 			}
 
 			local.joinGroup(group);

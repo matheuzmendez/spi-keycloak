@@ -10,8 +10,13 @@ public class UserMockImpl implements UserMock {
 	public UserDto obter(String url, String parametro, String username) {
 
 		FindUserProviderService findUserProviderService = new FindUserProviderService(url, parametro);
-		UserDto userDto = findUserProviderService.callConsultaUsuario(username);
-
+		UserDto userDto = findUserProviderService.consultaUsuario(username);
+		
+		if (userDto != null && userDto.getRole().isEmpty()) {
+			FindUserProviderService findUserProviderServiceDealer = new FindUserProviderService(url, parametro);
+			userDto = findUserProviderServiceDealer.consultaUsuarioDealer(username, userDto.getCodDealer());
+		}
+		
 		return (userDto != null) ? userDto : null;
 	}
 
@@ -22,3 +27,4 @@ public class UserMockImpl implements UserMock {
 	}
 
 }
+                                                                                                                                                

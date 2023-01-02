@@ -1,4 +1,4 @@
-package vwfsbr.comission.keycloakspi.user.service.roles;
+package vwfsbr.comission.keycloakspi.user.service.utils;
 
 public class TypesRoles {
 
