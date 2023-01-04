@@ -89,20 +89,6 @@ public class AuthenticateUserProviderService {
 			DocumentBuilder builder;
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new InputSource(new StringReader(responseAutenticaUsuario)));
-			NodeList nList = doc.getElementsByTagName("Authentication");
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					String authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
-							.getTextContent();
-					log.info(authenticationStatus.equals(isValid) ? "Autenticado" : "Autenticacao Falhou");
-
-					return (authenticationStatus.equals(isValid) ? true : false);
-				}
-			}
-
 			NodeList nListPerfis = doc.getElementsByTagName("Permissoes");
 			for (int tempPerfis = 0; tempPerfis < nListPerfis.getLength(); tempPerfis++) {
 				Node nNodePerfis = nListPerfis.item(tempPerfis);
@@ -121,6 +107,21 @@ public class AuthenticateUserProviderService {
 				}
 			}
 			log.info(groupUser);
+			
+			NodeList nList = doc.getElementsByTagName("Authentication");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					String authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
+							.getTextContent();
+					log.info(authenticationStatus.equals(isValid) ? "Autenticado" : "Autenticacao Falhou");
+
+					return (authenticationStatus.equals(isValid) ? true : false);
+				}
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
