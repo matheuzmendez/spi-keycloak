@@ -4,6 +4,7 @@ import vwfsbr.comission.keycloakspi.user.service.AuthenticateUserProviderService
 import vwfsbr.comission.keycloakspi.user.service.FindUserProviderService;
 import vwfsbr.comission.keycloakspi.user.service.UserDto;
 import vwfsbr.comission.keycloakspi.user.service.UserMock;
+import vwfsbr.comission.keycloakspi.user.service.utils.ResponseAuthenticate;
 
 public class UserMockImpl implements UserMock {
 
@@ -15,11 +16,10 @@ public class UserMockImpl implements UserMock {
 		return (userDto != null) ? userDto : null;
 	}
 
-	public boolean autenticar(String url, String parametro, String username, String password, String groupUser) {
+	public ResponseAuthenticate autenticar(String url, String parametro, String username, String password) {
 		AuthenticateUserProviderService authenticateUserProviderService = new AuthenticateUserProviderService(url,
 				parametro);
-		System.out.println("2+ " + groupUser);
-		return authenticateUserProviderService.callAutenticaUsuario(username, password, groupUser);
+		return authenticateUserProviderService.callAutenticaUsuario(username, password);
 	}
 
 }

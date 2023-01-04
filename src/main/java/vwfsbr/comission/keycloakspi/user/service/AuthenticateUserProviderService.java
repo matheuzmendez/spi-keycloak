@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import vwfsbr.comission.keycloakspi.user.service.utils.RequestsXML;
+import vwfsbr.comission.keycloakspi.user.service.utils.ResponseAuthenticate;
 import vwfsbr.comission.keycloakspi.user.service.utils.TypesRoles;
 
 public class AuthenticateUserProviderService {
@@ -44,13 +45,12 @@ public class AuthenticateUserProviderService {
 		this.con.setRequestProperty("SOAPAction", parametro);
 	}
 
-	public boolean callAutenticaUsuario(String usuario, String senha, String groupUser) {
+	public ResponseAuthenticate callAutenticaUsuario(String usuario, String senha) {
 
 		String requestAutenticaUsuario = RequestsXML.requestAutenticaUsuario(usuario, senha);
 		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
-		log.info(groupUser);
-
-		return extractValidResponse(responseAutenticaUsuario, groupUser);
+		
+		return extractValidResponse(responseAutenticaUsuario);
 	}
 
 	private static String callSoapService(String requestAutenticaUsuario) {
@@ -78,12 +78,14 @@ public class AuthenticateUserProviderService {
 		}
 	}
 
-	private static Boolean extractValidResponse(String responseAutenticaUsuario, String groupUser) {
+	private static ResponseAuthenticate extractValidResponse(String responseAutenticaUsuario) {
 		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, 
 													TypesRoles.TPO_STA_GES_LOF,
 													TypesRoles.TPO_STA_GES_GOP, 
 													TypesRoles.TPO_STA_GES_GOF);
 		String isValid = "AutenticacaoOk";
+		String authenticationStatus = "";
+		String groupUser = "";
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
@@ -107,26 +109,24 @@ public class AuthenticateUserProviderService {
 				}
 			}
 			log.info(groupUser);
-			
+
 			NodeList nList = doc.getElementsByTagName("Authentication");
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
-					String authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
+					authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
 							.getTextContent();
 					log.info(authenticationStatus.equals(isValid) ? "Autenticado" : "Autenticacao Falhou");
-
-					return (authenticationStatus.equals(isValid) ? true : false);
 				}
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return false;
+		return new ResponseAuthenticate(authenticationStatus.equals(isValid), groupUser);
 	}
 
 }

@@ -23,6 +23,7 @@ import vwfsbr.comission.keycloakspi.provider.model.UserData;
 import vwfsbr.comission.keycloakspi.user.service.UserDto;
 import vwfsbr.comission.keycloakspi.user.service.UserMock;
 import vwfsbr.comission.keycloakspi.user.service.impl.UserMockImpl;
+import vwfsbr.comission.keycloakspi.user.service.utils.ResponseAuthenticate;
 
 public class ExternalUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
 
@@ -32,7 +33,6 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	private InitialContext initCtx;
 
 	private UserMock repo;
-	private String groupUser;
 
 	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
 		this.session = session;
@@ -109,16 +109,16 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		}
 
 		try {
-			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"),
+			ResponseAuthenticate responseAuthenticate = this.repo.autenticar(model.getConfig().getFirst("urlAutentica"),
 					model.getConfig().getFirst("parametroAutentica"), userModel.getUsername(),
-					input.getChallengeResponse(), this.groupUser)) {
-				log.info("1+ " + groupUser);
+					input.getChallengeResponse());
+
+			if (responseAuthenticate.isAuthenticated()) {
 				log.info("Password Matched for:" + userModel.getUsername());
-				
+
 				UserModel local = session.userLocalStorage().getUserByUsername(realm, userModel.getUsername());
 				if (local != null) {
-					log.info("Entrei Aqui");
-					setGroupUser(realm, local, groupUser);					
+					setGroupUser(realm, local, responseAuthenticate.getGroup());
 				}
 				return true;
 			} else {
@@ -134,7 +134,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 	private void setGroupUser(RealmModel realmModel, UserModel local, String groupUser) {
 		try {
-			log.info("3+ " + groupUser);
+			log.info(groupUser);
 			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, groupUser);
 			local.joinGroup(group);
 			log.info("Local User added in group: " + group.toString());

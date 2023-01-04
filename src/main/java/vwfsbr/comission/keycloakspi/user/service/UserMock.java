@@ -1,7 +1,9 @@
 package vwfsbr.comission.keycloakspi.user.service;
 
+import vwfsbr.comission.keycloakspi.user.service.utils.ResponseAuthenticate;
+
 public interface UserMock {
 	UserDto obter(String url, String parametro, String username);
 
-	boolean autenticar(String url, String parametro, String username, String password, String group);
+	ResponseAuthenticate autenticar(String url, String parametro, String username, String password);
 }
