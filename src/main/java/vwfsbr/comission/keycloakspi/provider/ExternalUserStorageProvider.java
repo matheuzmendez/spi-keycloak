@@ -122,7 +122,9 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 				if (local != null) {
 //					if (local.getGroupsCount() < 1) {
 						setGroupUser(realm, local, responseAuthenticate.getGroup());
-						log.info(local.getGroupsStream().iterator().next().toString());
+						log.info("TESTE1: >>>>>>" + local.getGroupsStream().iterator().next().getId());
+						log.info("TESTE2: >>>>>>" + local.getGroupsStream().iterator().next().getName());
+						log.info("TESTE3: >>>>>>" + local.getGroupsStream().iterator().next().getParent());
 //					} else {
 ////						log.info(local.getGroupsStream());
 ////						log.info(String.valueOf(local.getGroupsCount()));
