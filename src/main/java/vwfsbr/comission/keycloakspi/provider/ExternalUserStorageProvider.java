@@ -66,7 +66,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			return null;
 		}
 
-		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"), model.getConfig().getFirst("parametroConsulta"), username);
+		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"),
+				model.getConfig().getFirst("parametroConsulta"), username);
 
 		if (user == null) {
 			log.info("Username: " + username + " not found");
@@ -107,10 +108,17 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		}
 
 		try {
+			String groupUser = "";
 			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"),
 					model.getConfig().getFirst("parametroAutentica"), userModel.getUsername(),
-					input.getChallengeResponse())) {
+					input.getChallengeResponse(), groupUser)) {
+				
 				log.info("Password Matched for:" + userModel.getUsername());
+				
+				UserModel local = session.userLocalStorage().getUserByUsername(realm, userModel.getUsername());
+				if (local == null) {
+					setGroupUser(realm, local, groupUser);					
+				}
 				return true;
 			} else {
 				log.info("Password Not Matched for:" + userModel.getEmail());
@@ -121,6 +129,16 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			return false;
 		}
 
+	}
+
+	private void setGroupUser(RealmModel realmModel, UserModel local, String groupUser) {
+		try {
+			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, groupUser);
+			local.joinGroup(group);
+			log.info("Local User added in group: " + group.toString());
+		} catch (NotFoundException e) {
+			log.info("Group not found: " + e);
+		}
 	}
 
 	@Override
@@ -161,15 +179,6 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
-			
-			GroupModel group = null;
-			try {
-				group = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());				
-				local.joinGroup(group);
-				log.info("Local User added in group: " + group.toString());
-			} catch (NotFoundException e) {
-				log.info("Group not found: " + e);
-			}
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());

@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import vwfsbr.comission.keycloakspi.user.service.utils.RequestsXML;
+import vwfsbr.comission.keycloakspi.user.service.utils.TypesRoles;
 
 public class AuthenticateUserProviderService {
 	private static final Logger log = LoggerFactory.getLogger(AuthenticateUserProviderService.class);
@@ -40,13 +43,13 @@ public class AuthenticateUserProviderService {
 		this.con = (HttpURLConnection) obj.openConnection();
 		this.con.setRequestProperty("SOAPAction", parametro);
 	}
-	
-	public boolean callAutenticaUsuario(String usuario, String senha) {
+
+	public boolean callAutenticaUsuario(String usuario, String senha, String groupUser) {
 
 		String requestAutenticaUsuario = RequestsXML.requestAutenticaUsuario(usuario, senha);
 		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
-		
-		return extractValidResponse(responseAutenticaUsuario);
+
+		return extractValidResponse(responseAutenticaUsuario, groupUser);
 	}
 
 	private static String callSoapService(String requestAutenticaUsuario) {
@@ -61,20 +64,24 @@ public class AuthenticateUserProviderService {
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
-			
+
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
 			}
-			
+
 			in.close();
-			
+
 			return response.toString();
 		} catch (Exception e) {
 			return e.getMessage();
 		}
 	}
 
-	private static Boolean extractValidResponse(String responseAutenticaUsuario) {
+	private static Boolean extractValidResponse(String responseAutenticaUsuario, String groupUser) {
+		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, 
+													TypesRoles.TPO_STA_GES_LOF,
+													TypesRoles.TPO_STA_GES_GOP, 
+													TypesRoles.TPO_STA_GES_GOF);
 		String isValid = "AutenticacaoOk";
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -89,9 +96,27 @@ public class AuthenticateUserProviderService {
 					Element eElement = (Element) nNode;
 					String authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
 							.getTextContent();
-					System.out.println(authenticationStatus);
+					log.info(authenticationStatus.equals(isValid) ? "Autenticado" : "Autenticacao Falhou");
 
 					return (authenticationStatus.equals(isValid) ? true : false);
+				}
+			}
+
+			NodeList nListPerfis = doc.getElementsByTagName("Perfis");
+			for (int tempPerfis = 0; tempPerfis < nListPerfis.getLength(); tempPerfis++) {
+				Node nNodePerfis = nListPerfis.item(tempPerfis);
+
+				if (nNodePerfis.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElementPerfis = (Element) nNodePerfis;
+					for (int tempPerfis1 = 0; tempPerfis1 < eElementPerfis.getElementsByTagName("a:string")
+							.getLength(); tempPerfis1++) {
+						if (typesRolesList.contains(
+								eElementPerfis.getElementsByTagName("a:string").item(tempPerfis1).getTextContent())) {
+							groupUser = eElementPerfis.getElementsByTagName("a:string").item(tempPerfis1)
+									.getTextContent();
+						}
+
+					}
 				}
 			}
 		} catch (Exception e) {

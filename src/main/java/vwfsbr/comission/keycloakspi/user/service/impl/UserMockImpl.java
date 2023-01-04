@@ -12,18 +12,13 @@ public class UserMockImpl implements UserMock {
 		FindUserProviderService findUserProviderService = new FindUserProviderService(url, parametro);
 		UserDto userDto = findUserProviderService.consultaUsuario(username);
 		
-		if (userDto != null && userDto.getRole().isEmpty()) {
-			FindUserProviderService findUserProviderServiceDealer = new FindUserProviderService(url, parametro);
-			userDto = findUserProviderServiceDealer.consultaUsuarioDealer(username, userDto.getCodDealer());
-		}
-		
 		return (userDto != null) ? userDto : null;
 	}
 
-	public boolean autenticar(String url, String parametro, String username, String password) {
+	public boolean autenticar(String url, String parametro, String username, String password, String groupUser) {
 		AuthenticateUserProviderService authenticateUserProviderService = new AuthenticateUserProviderService(url,
 				parametro);
-		return authenticateUserProviderService.callAutenticaUsuario(username, password);
+		return authenticateUserProviderService.callAutenticaUsuario(username, password, groupUser);
 	}
 
 }

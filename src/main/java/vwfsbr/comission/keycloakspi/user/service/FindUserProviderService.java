@@ -33,7 +33,6 @@ public class FindUserProviderService {
 			buildClient(url, parametro);
 		} catch (IOException e) {
 			log.error("Error during build Client: " + url, e);
-			e.printStackTrace();
 		}
 	}
 
@@ -48,15 +47,7 @@ public class FindUserProviderService {
 		String requestConsultaUsuario = RequestsXML.requestConsultaUsuario(usuario);
 		String responseConsultaUsuario = callSoapService(requestConsultaUsuario);
 		UserDto userDto = extractInfoUser(usuario, responseConsultaUsuario);
-		
-		return (userDto != null) ? userDto : null; 
-	}
 
-	public UserDto consultaUsuarioDealer(String usuario, String codDealer) {
-		String requestConsultaUsuario = RequestsXML.requestConsultaUsuario(usuario, codDealer);
-		String responseConsultaUsuario = callSoapService(requestConsultaUsuario);
-		UserDto userDto = extractInfoUser(usuario, responseConsultaUsuario);
-		
 		return (userDto != null) ? userDto : null;
 	}
 
@@ -72,13 +63,13 @@ public class FindUserProviderService {
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
-			
+
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
 			}
-			
+
 			in.close();
-			
+
 			return response.toString();
 		} catch (Exception e) {
 			log.error("Error calling Soap Service: " + e);
@@ -87,21 +78,19 @@ public class FindUserProviderService {
 	}
 
 	private static UserDto extractInfoUser(String usuario, String responseConsultaUsuario) {
-		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, 
-													TypesRoles.TPO_STA_GES_LOF,
-													TypesRoles.TPO_STA_GES_GOP, 
-													TypesRoles.TPO_STA_GES_GOF);
+		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, TypesRoles.TPO_STA_GES_LOF,
+				TypesRoles.TPO_STA_GES_GOP, TypesRoles.TPO_STA_GES_GOF);
 
 		String username, firstName, lastName;
 		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "", codMontadora = "";
-		
+
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new InputSource(new StringReader(responseConsultaUsuario)));
 			NodeList nList = doc.getElementsByTagName("Usuario");
-			
+
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
 
@@ -151,11 +140,12 @@ public class FindUserProviderService {
 						if (nNodeConcessionaria.getNodeType() == Node.ELEMENT_NODE) {
 							Element eElementConcessionaria = (Element) nNodeConcessionaria;
 							montadora = eElementConcessionaria.getElementsByTagName("Nome").item(0).getTextContent();
-							codMontadora = eElementConcessionaria.getElementsByTagName("CodigoMontadora").item(0).getTextContent();
+							codMontadora = eElementConcessionaria.getElementsByTagName("CodigoMontadora").item(0)
+									.getTextContent();
 						}
-					}					
-					return (username.equals(usuario)) ? new UserDto(username, email, firstName, lastName, codDealer, cargo, filial, nomeFilial,
-								montadora, role, codMontadora) : null;						
+					}
+					return (username.equals(usuario)) ? new UserDto(username, email, firstName, lastName, codDealer,
+							cargo, filial, nomeFilial, montadora, role, codMontadora) : null;
 				}
 			}
 		} catch (Exception e) {
