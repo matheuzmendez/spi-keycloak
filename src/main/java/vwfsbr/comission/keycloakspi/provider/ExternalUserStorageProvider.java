@@ -32,6 +32,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	private InitialContext initCtx;
 
 	private UserMock repo;
+	private String groupUser;
 
 	public ExternalUserStorageProvider(KeycloakSession session, ComponentModel model) {
 		this.session = session;
@@ -108,10 +109,9 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		}
 
 		try {
-			String groupUser = "";
 			if (this.repo.autenticar(model.getConfig().getFirst("urlAutentica"),
 					model.getConfig().getFirst("parametroAutentica"), userModel.getUsername(),
-					input.getChallengeResponse(), groupUser)) {
+					input.getChallengeResponse(), this.groupUser)) {
 				log.info("1+ " + groupUser);
 				log.info("Password Matched for:" + userModel.getUsername());
 				
