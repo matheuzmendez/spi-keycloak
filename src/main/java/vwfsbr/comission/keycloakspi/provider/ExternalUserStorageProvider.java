@@ -12,6 +12,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.UserModelDelegate;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.slf4j.Logger;
@@ -121,9 +122,10 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 				if (local != null) {
 //					if (local.getGroupsCount() < 1) {
 						setGroupUser(realm, local, responseAuthenticate.getGroup());
-						log.info(local.getGroupsStream().findAny().toString());
-						log.info(String.valueOf(local.getGroupsCount()));
+						log.info(local.getGroupsStream().iterator().next().toString());
 //					} else {
+////						log.info(local.getGroupsStream());
+////						log.info(String.valueOf(local.getGroupsCount()));
 //						leaveAndSetGroup(realm, local, responseAuthenticate.getGroup());
 //					}
 				}
@@ -151,17 +153,16 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 	}
 
 //	private void leaveAndSetGroup(RealmModel realm, UserModel local, String group) {
-////		try {
-//		;
-////			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realm, local.getGroupsStream().g);
-////			if (leaveGroup != null) {
-////				local.leaveGroup(leaveGroup);
-////				log.info("Local User leaving group: " + leaveGroup.toString());
-////				setGroupUser(realm, local, group);
-////			}
-////		} catch (NotFoundException e) {
-////			log.info("Group not found: " + e);
-////		}
+		//		try {
+//			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realm, group);
+//			if (leaveGroup != null) {
+//				local.leaveGroup(leaveGroup);
+//				log.info("Local User leaving group: " + leaveGroup.toString());
+//				setGroupUser(realm, local, group);
+//			}
+//		} catch (NotFoundException e) {
+//			log.info("Group not found: " + e);
+//		}
 //	}
 
 	@Override
