@@ -116,7 +116,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 				log.info("Password Matched for:" + userModel.getUsername());
 				
 				UserModel local = session.userLocalStorage().getUserByUsername(realm, userModel.getUsername());
-				if (local == null) {
+				if (local != null) {
+					log.info("Entrei Aqui");
 					setGroupUser(realm, local, groupUser);					
 				}
 				return true;
@@ -133,9 +134,11 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 	private void setGroupUser(RealmModel realmModel, UserModel local, String groupUser) {
 		try {
+			log.info(groupUser);
 			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, groupUser);
 			local.joinGroup(group);
 			log.info("Local User added in group: " + group.toString());
+			log.info("Grupo: " + local.getGroupsStream().toString());
 		} catch (NotFoundException e) {
 			log.info("Group not found: " + e);
 		}

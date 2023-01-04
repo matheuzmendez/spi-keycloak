@@ -102,7 +102,7 @@ public class AuthenticateUserProviderService {
 				}
 			}
 
-			NodeList nListPerfis = doc.getElementsByTagName("Perfis");
+			NodeList nListPerfis = doc.getElementsByTagName("Permissoes");
 			for (int tempPerfis = 0; tempPerfis < nListPerfis.getLength(); tempPerfis++) {
 				Node nNodePerfis = nListPerfis.item(tempPerfis);
 
