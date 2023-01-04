@@ -78,8 +78,10 @@ public class FindUserProviderService {
 	}
 
 	private static UserDto extractInfoUser(String usuario, String responseConsultaUsuario) {
-		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, TypesRoles.TPO_STA_GES_LOF,
-				TypesRoles.TPO_STA_GES_GOP, TypesRoles.TPO_STA_GES_GOF);
+		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, 
+													TypesRoles.TPO_STA_GES_LOF,
+													TypesRoles.TPO_STA_GES_GOP, 
+													TypesRoles.TPO_STA_GES_GOF);
 
 		String username, firstName, lastName;
 		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "", codMontadora = "";
@@ -149,7 +151,7 @@ public class FindUserProviderService {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Error extracting info of User: User not found in External DB");
+			log.error("Error extracting info of User: User not found in External DB: " + e);
 			return null;
 		}
 		return null;

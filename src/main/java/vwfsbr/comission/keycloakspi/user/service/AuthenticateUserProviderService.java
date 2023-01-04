@@ -33,7 +33,7 @@ public class AuthenticateUserProviderService {
 		try {
 			buildClient(url, parametro);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error during build Client: " + url, e);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class AuthenticateUserProviderService {
 
 		String requestAutenticaUsuario = RequestsXML.requestAutenticaUsuario(usuario, senha);
 		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
-		
+
 		return extractValidResponse(responseAutenticaUsuario);
 	}
 
@@ -108,7 +108,6 @@ public class AuthenticateUserProviderService {
 					}
 				}
 			}
-			log.info(groupUser);
 
 			NodeList nList = doc.getElementsByTagName("Authentication");
 			for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -118,14 +117,13 @@ public class AuthenticateUserProviderService {
 					Element eElement = (Element) nNode;
 					authenticationStatus = eElement.getElementsByTagName("AuthenticationStatus").item(0)
 							.getTextContent();
-					log.info(authenticationStatus.equals(isValid) ? "Autenticado" : "Autenticacao Falhou");
 				}
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error extracting info of User: User not found in External DB: " + e);
+			return null;
 		}
-
 		return new ResponseAuthenticate(authenticationStatus.equals(isValid), groupUser);
 	}
 
