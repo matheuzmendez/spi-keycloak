@@ -12,7 +12,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.UserModelDelegate;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import vwfsbr.comission.keycloakspi.user.service.UserDto;
 import vwfsbr.comission.keycloakspi.user.service.UserMock;
 import vwfsbr.comission.keycloakspi.user.service.impl.UserMockImpl;
 import vwfsbr.comission.keycloakspi.user.service.utils.ResponseAuthenticate;
-import vwfsbr.comission.keycloakspi.user.service.utils.TypesRoles;
 
 public class ExternalUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
 
@@ -120,16 +118,11 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 				UserModel local = session.userLocalStorage().getUserByUsername(realm, userModel.getUsername());
 				if (local != null) {
-//					if (local.getGroupsCount() < 1) {
+					if (local.getGroupsCount() < 1) {
 						setGroupUser(realm, local, responseAuthenticate.getGroup());
-						log.info("TESTE1: >>>>>>" + local.getGroupsStream().iterator().next().getId());
-						log.info("TESTE2: >>>>>>" + local.getGroupsStream().iterator().next().getName());
-						log.info("TESTE3: >>>>>>" + local.getGroupsStream().iterator().next().getParent());
-//					} else {
-////						log.info(local.getGroupsStream());
-////						log.info(String.valueOf(local.getGroupsCount()));
-//						leaveAndSetGroup(realm, local, responseAuthenticate.getGroup());
-//					}
+					} else {
+						leaveAndSetGroup(realm, local, responseAuthenticate.getGroup());
+					}
 				}
 				return true;
 			} else {
@@ -145,27 +138,26 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 	private void setGroupUser(RealmModel realmModel, UserModel local, String groupUser) {
 		try {
-			log.info(groupUser);
 			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, groupUser);
 			local.joinGroup(group);
-			log.info("Local User added in group: " + group.toString());
+			log.info("Local User added in group: " + group.getName());
 		} catch (NotFoundException e) {
 			log.info("Group not found: " + e);
 		}
 	}
 
-//	private void leaveAndSetGroup(RealmModel realm, UserModel local, String group) {
-		//		try {
-//			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realm, group);
-//			if (leaveGroup != null) {
-//				local.leaveGroup(leaveGroup);
-//				log.info("Local User leaving group: " + leaveGroup.toString());
-//				setGroupUser(realm, local, group);
-//			}
-//		} catch (NotFoundException e) {
-//			log.info("Group not found: " + e);
-//		}
-//	}
+	private void leaveAndSetGroup(RealmModel realm, UserModel local, String group) {
+		try {
+			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realm, local.getGroupsStream().iterator().next().getName());
+			if (leaveGroup != null) {
+				local.leaveGroup(leaveGroup);
+				log.info("Local User leaving group: " + leaveGroup.getName());
+				setGroupUser(realm, local, group);
+			}
+		} catch (NotFoundException e) {
+			log.info("Group not found: " + e);
+		}
+	}
 
 	@Override
 	public void close() {
@@ -208,11 +200,6 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
-		} else {
-
-			GroupModel joinGroup = KeycloakModelUtils.findGroupByPath(realmModel, userData.getRole());
-			local.joinGroup(joinGroup);
-			log.info("Local User added in group: " + joinGroup.toString());
 		}
 		return new UserModelDelegate(local) {
 			@Override
