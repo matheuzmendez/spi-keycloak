@@ -48,6 +48,7 @@ public class AuthenticateUserProviderService {
 
 		String requestAutenticaUsuario = RequestsXML.requestAutenticaUsuario(usuario, senha);
 		String responseAutenticaUsuario = callSoapService(requestAutenticaUsuario);
+		log.info(groupUser);
 
 		return extractValidResponse(responseAutenticaUsuario, groupUser);
 	}
@@ -119,6 +120,7 @@ public class AuthenticateUserProviderService {
 					}
 				}
 			}
+			log.info(groupUser);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
