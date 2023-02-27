@@ -6,5 +6,6 @@ public class TypesRoles {
 	public static final String TPO_STA_GES_LOF = "TPO-STA-GES-LOF";
 	public static final String TPO_STA_GES_GOP = "TPO-STA-GES-GOP";
 	public static final String TPO_STA_GES_GOF = "TPO-STA-GES-GOF";
+	public static final String TPO_STA_GES_REL = "TPO-STA-GES-REL";
 
 }

@@ -81,7 +81,8 @@ public class FindUserProviderService {
 		List<String> typesRolesList = Arrays.asList(TypesRoles.TPO_STA_GES_LOP, 
 													TypesRoles.TPO_STA_GES_LOF,
 													TypesRoles.TPO_STA_GES_GOP, 
-													TypesRoles.TPO_STA_GES_GOF);
+													TypesRoles.TPO_STA_GES_GOF,
+													TypesRoles.TPO_STA_GES_REL);
 
 		String username, firstName, lastName;
 		String email, codDealer, cargo, filial = "", nomeFilial = "", montadora = "", role = "", codMontadora = "";
