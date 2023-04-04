@@ -162,11 +162,13 @@ public class FindUserProviderService {
 	public static String ajustarCPF(String cpf) {
 		int zerosToAdd = 11 - cpf.length();
 		if (zerosToAdd > 0) {
+			log.info("CPF sem ajuste: " + cpf);
 			StringBuilder builder = new StringBuilder(cpf);
 			for (int i = 0; i < zerosToAdd; i++) {
 				builder.insert(0, "0");
 			}
 			cpf = builder.toString();
+			log.info("CPF com ajuste: " + cpf);
 		}
 		return cpf;
 	}

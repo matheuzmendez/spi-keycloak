@@ -69,6 +69,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 		UserDto user = this.repo.obter(model.getConfig().getFirst("urlConsulta"),
 				model.getConfig().getFirst("parametroConsulta"), username);
+		
+		username = ajustarCPF(username);
 
 		if (user == null) {
 			log.info("Username: " + username + " not found");
@@ -208,5 +210,19 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			}
 		};
 	}
-
+	
+	public String ajustarCPF(String cpf) {
+		int zerosToAdd = 11 - cpf.length();
+		if (zerosToAdd > 0) {
+			log.info("Username sem ajuste: " + cpf);
+			StringBuilder builder = new StringBuilder(cpf);
+			for (int i = 0; i < zerosToAdd; i++) {
+				builder.insert(0, "0");
+			}
+			cpf = builder.toString();
+			log.info("Username com ajuste: " + cpf);
+		}
+		return cpf;
+	}
+	
 }
