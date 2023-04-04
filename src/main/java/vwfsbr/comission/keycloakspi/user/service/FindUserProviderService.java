@@ -100,6 +100,7 @@ public class FindUserProviderService {
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
 					username = eElement.getElementsByTagName("CpfCnpj").item(0).getTextContent();
+					username = ajustarCPF(username);
 					email = eElement.getElementsByTagName("Email").item(0).getTextContent();
 					firstName = eElement.getElementsByTagName("Nome").item(0).getTextContent();
 					lastName = "";
@@ -157,4 +158,17 @@ public class FindUserProviderService {
 		}
 		return null;
 	}
+
+	public static String ajustarCPF(String cpf) {
+		int zerosToAdd = 11 - cpf.length();
+		if (zerosToAdd > 0) {
+			StringBuilder builder = new StringBuilder(cpf);
+			for (int i = 0; i < zerosToAdd; i++) {
+				builder.insert(0, "0");
+			}
+			cpf = builder.toString();
+		}
+		return cpf;
+	}
+	
 }
