@@ -33,7 +33,7 @@ public class ExternalUserStorageProviderFactory implements UserStorageProviderFa
 
 	@Override
 	public ExternalUserStorageProvider create(KeycloakSession session, ComponentModel model) {
-		log.info("Calling create");
+		log.info("Calling create: Version 1.0.0");
 		return new ExternalUserStorageProvider(session, model);
 	}
 
