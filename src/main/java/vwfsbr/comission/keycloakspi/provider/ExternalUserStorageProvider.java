@@ -202,6 +202,19 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
+		} else {
+			log.info("Local User Found, updating user data");
+			local.setEmail(userData.getEmail());
+			local.setFirstName(userData.getFirstName());
+			local.setLastName(userData.getLastName());
+			local.setEmailVerified(true);
+			local.setSingleAttribute("codDealer", userData.getCodDealer());
+			local.setSingleAttribute("cargo", userData.getCargo());
+			local.setSingleAttribute("filial", userData.getFilial());
+			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
+			local.setSingleAttribute("montadora", userData.getMontadora());
+			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
+			log.info("Local User Succesfully Updated for username: " + userData.getUsername());
 		}
 		return new UserModelDelegate(local) {
 			@Override
