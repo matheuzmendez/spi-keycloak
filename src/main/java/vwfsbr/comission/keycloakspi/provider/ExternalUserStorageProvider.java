@@ -214,6 +214,8 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			local.setSingleAttribute("nomeFilial", userData.getNomeFilial());
 			local.setSingleAttribute("montadora", userData.getMontadora());
 			local.setSingleAttribute("codMontadora", userData.getCodMontadora());
+			
+			session.userCache().clear();
 			log.info("Local User Succesfully Updated for username: " + userData.getUsername());
 		}
 		return new UserModelDelegate(local) {
