@@ -142,6 +142,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 		try {
 			GroupModel group = KeycloakModelUtils.findGroupByPath(realmModel, groupUser);
 			local.joinGroup(group);
+			session.userCache().clear();
 			log.info("Local User added in group: " + group.getName());
 		} catch (NotFoundException e) {
 			log.info("Group not found: " + e);
@@ -153,6 +154,7 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			GroupModel leaveGroup = KeycloakModelUtils.findGroupByPath(realm, local.getGroupsStream().iterator().next().getName());
 			if (leaveGroup != null) {
 				local.leaveGroup(leaveGroup);
+				session.userCache().clear();
 				log.info("Local User leaving group: " + leaveGroup.getName());
 				setGroupUser(realm, local, group);
 			}
@@ -203,8 +205,12 @@ public class ExternalUserStorageProvider implements UserStorageProvider, UserLoo
 			session.userCache().clear();
 			log.info("Local User Succesfully Created for username: " + userData.getUsername());
 		} else {
-			log.info("Local User Found, updating user data");
+			log.info("Local User Found, updating user to Local");
+			local.setFederationLink(this.model.getId());
+			local.setEnabled(true);
+			local.setUsername(userData.getUsername());
 			local.setEmail(userData.getEmail());
+			local.setCreatedTimestamp(System.currentTimeMillis());
 			local.setFirstName(userData.getFirstName());
 			local.setLastName(userData.getLastName());
 			local.setEmailVerified(true);
